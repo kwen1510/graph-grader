@@ -2,9 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hello World</title>
+    <title>Graph Grader</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #result img { max-width: 100%; height: auto; }
+    </style>
 </head>
 <body>
-    <h1>Hello, world!</h1>
+    <h1>Graph Grader</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Upload</button>
+    </form>
+    <div id="result"></div>
+    <script>
+        const form = document.getElementById('uploadForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const res = await fetch('/grade', { method: 'POST', body: formData });
+            if (res.ok) {
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const img = new Image();
+                img.src = url;
+                const result = document.getElementById('result');
+                result.innerHTML = '';
+                result.appendChild(img);
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Failed to grade image');
+            }
+        });
+    </script>
 </body>
 </html>
